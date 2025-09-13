@@ -1,0 +1,13 @@
+ru:
+  layouts:
+    header:
+      brand: "Главная"
+      login_github: "Войти с GitHub"
+      logout: "Выйти"
+  auth:
+    signed_in: "Вы вошли в систему"
+    signed_out: "Вы вышли из системы"
+  home:
+      index:
+        title: "Главная"
+        lead: "Добро пожаловать! Войдите через GitHub, чтобы продолжить."

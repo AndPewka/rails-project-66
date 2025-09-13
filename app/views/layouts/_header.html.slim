@@ -1,0 +1,22 @@
+nav.navbar.navbar-expand-lg.navbar-light.bg-light.mb-4
+  .container
+    = link_to t('.brand'), root_path, class: 'navbar-brand'
+
+    #navbarNav.collapse.navbar-collapse
+      ul.navbar-nav.me-auto
+
+      ul.navbar-nav.ms-auto
+        - if current_user
+          li.nav-item.me-3
+            span.nav-link.disabled = current_user.email
+          li.nav-item
+            = button_to t('.logout'), logout_path,
+                        method: :delete,
+                        class: 'btn btn-link nav-link p-0',
+                        form: { data: { turbo: false } }
+        - else
+          li.nav-item
+            = button_to t('.login_github'), auth_request_path(:github),
+                        method: :post,
+                        class: 'btn btn-primary',
+                        data: { turbo: false }
