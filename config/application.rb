@@ -21,6 +21,8 @@ module RailsProject66
     config.i18n.available_locales = %i[ru en]
     config.i18n.default_locale = :ru
 
+    routes.default_url_options = { host: ENV['BASE_URL'] } if ENV['BASE_URL'].present?
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

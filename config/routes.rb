@@ -22,5 +22,9 @@ Rails.application.routes.draw do
     resources :checks, only: %i[create show], module: :repositories
   end
 
+  namespace :api do
+    resources :checks, only: :create
+  end
+
   resources :repositories, only: %i[index new create]
 end

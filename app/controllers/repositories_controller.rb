@@ -43,6 +43,7 @@ class RepositoriesController < ApplicationController
     )
 
     if repo.save
+      install_github_webhook!(client, gh_repo.full_name)
       redirect_to repositories_path, notice: t('.created')
     else
       redirect_to new_repository_path, alert: repo.errors.full_messages.to_sentence
@@ -52,6 +53,24 @@ class RepositoriesController < ApplicationController
   end
 
   private
+
+  def install_github_webhook!(client, full_name)
+    return if Rails.application.routes.default_url_options[:host].blank?
+
+    url_helpers = Rails.application.routes.url_helpers
+    callback_url = url_helpers.api_checks_url
+
+    config  = { url: callback_url, content_type: 'json', insecure_ssl: '0' }
+    options = { events: ['push'], active: true }
+
+    client.create_hook(full_name, 'web', config, **options)
+  rescue Octokit::UnprocessableEntity => e
+    Rails.logger.info "Webhook already exists for #{full_name}: #{e.message}"
+  rescue Octokit::Forbidden => e
+    Rails.logger.warn "No permission to create webhook for #{full_name}: #{e.message}"
+  rescue Octokit::Unauthorized, Octokit::NotFound => e
+    Rails.logger.warn "Cannot create webhook for #{full_name}: #{e.class} #{e.message}"
+  end
 
   def github_client
     @github_client ||= ApplicationContainer[:github_client].call(

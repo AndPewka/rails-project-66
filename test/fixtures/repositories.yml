@@ -1,6 +1,6 @@
 mine:
   id: 101
-  user: one        # label из users.yml
+  user: one
   github_id: 900001
   name: "mine"
   full_name: "me/mine"

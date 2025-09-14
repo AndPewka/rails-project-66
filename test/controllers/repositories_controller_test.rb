@@ -56,6 +56,15 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
       ssh_url: 'git@github.com:me/rails.git'
     ), ['me/rails']
 
+    fake.expect :create_hook, true do |full_name, hook, config, **opts|
+      full_name == 'me/rails' &&
+        hook == 'web' &&
+        config.is_a?(Hash) &&
+        config[:url].to_s.include?('/api/checks') &&
+        opts[:events] == ['push'] &&
+        opts[:active] == true
+    end
+
     ApplicationContainer.stub(:github_client, ->(**) { fake }) do
       assert_difference -> { user.repositories.count }, +1 do
         post repositories_path, params: { github_id: 'me/rails' }

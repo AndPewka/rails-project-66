@@ -22,7 +22,8 @@
       strong = t('.commit')
       | :
       - if @check.commit_id.present?
-        = link_to @check.commit_id, "https://github.com/#{@repository.full_name}/commit/#{@check.commit_id}", target: '_blank', rel: 'noopener'
+        - short = @check.commit_id.first(7)
+        = link_to short, "https://github.com/#{@repository.full_name}/commit/#{@check.commit_id}", target: '_blank', rel: 'noopener'
       - else
         = '-'
 
