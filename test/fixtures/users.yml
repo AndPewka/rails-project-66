@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id: 1
+  email: aboba@mail.ru
+  nickname: MyString1
+  name: MyString1
+  image_url: MyString2
+  token: MyString2
+
+two:
+  id: 2
+  email: root@mail.ru
+  nickname: MyString1
+  name: MyString1
+  image_url: MyString1
+  token: MyString1

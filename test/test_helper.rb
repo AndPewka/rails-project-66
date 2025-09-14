@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'minitest/power_assert'
+
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'

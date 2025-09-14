@@ -1,0 +1,19 @@
+mine:
+  id: 101
+  user: one        # label из users.yml
+  github_id: 900001
+  name: "mine"
+  full_name: "me/mine"
+  language: "Ruby"
+  clone_url: "https://github.com/me/mine"
+  ssh_url: "git@github.com:me/mine.git"
+
+other:
+  id: 102
+  user: two
+  github_id: 900002
+  name: "other"
+  full_name: "you/other"
+  language: "Ruby"
+  clone_url: "https://github.com/you/other"
+  ssh_url: "git@github.com:you/other.git"

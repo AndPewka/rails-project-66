@@ -49,3 +49,6 @@ Metrics/AbcSize:
 
 Style/StringLiterals:
   Enabled: true
+
+Metrics/ClassLength:
+  Enabled: False
