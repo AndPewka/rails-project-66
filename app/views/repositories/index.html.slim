@@ -1,0 +1,32 @@
+.container
+  h1 = t('.title')
+
+  - if current_user
+    - if @repositories.any?
+      table.table.table-striped.mt-3
+        thead
+          tr
+            th = t('.name')
+            th = t('.full_name')
+            th = t('.language')
+            th = t('.clone_url')
+            th = t('.ssh_url')
+        tbody
+          - @repositories.each do |r|
+            tr
+              td = r.name
+              td = r.full_name
+              td = r.language
+              td = link_to r.clone_url, r.clone_url, target: '_blank', rel: 'noopener'
+              td = r.ssh_url
+    - else
+      p.text-muted = t('.empty')
+
+    = link_to t('.add'), new_repository_path, class: 'btn btn-primary mt-3'
+
+  - else
+    p.lead = t('.sign_in_to_view')
+    = button_to t('layouts.header.login_github'), auth_request_path(:github),
+                method: :post,
+                class: 'btn btn-primary',
+                data: { turbo: false }

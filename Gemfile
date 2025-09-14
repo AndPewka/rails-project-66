@@ -23,6 +23,9 @@ gem 'jbuilder'
 
 gem 'slim-rails'
 
+gem 'enumerize'
+gem 'octokit'
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 

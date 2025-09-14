@@ -4,10 +4,32 @@ ru:
       brand: "Главная"
       login_github: "Войти с GitHub"
       logout: "Выйти"
+
+  repositories:
+    index:
+      title: "Мои репозитории"
+      name: "Имя"
+      full_name: "Полное имя"
+      language: "Язык"
+      clone_url: "Clone (HTTPS)"
+      ssh_url: "SSH"
+      add: "Добавить репозиторий"
+      empty: "Пока нет репозиториев"
+      sign_in_to_view: "Войдите через GitHub, чтобы просматривать свои репозитории"
+
+    new:
+      title: "Добавление репозитория"
+      select_repo: "Выберите репозиторий (Ruby)"
+      add: "Добавить"
+      no_repos: "У вас нет репозиториев на GitHub или они не на Ruby."
+      github_auth_error: "Ошибка авторизации GitHub"
+
+    create:
+      created: "Репозиторий добавлен"
+      not_found: "Репозиторий не найден"
+      only_ruby: "Добавлять можно только репозитории на Ruby"
+
   auth:
     signed_in: "Вы вошли в систему"
     signed_out: "Вы вышли из системы"
-  home:
-      index:
-        title: "Главная"
-        lead: "Добро пожаловать! Войдите через GitHub, чтобы продолжить."
+    sign_in_required: "Войдите, чтобы продолжить"
