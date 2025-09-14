@@ -1,0 +1,26 @@
+.container
+  h1 = @repository.name
+  p = @repository.full_name
+  = button_to t('.run_check', default: 'Run check'), repository_checks_path(@repository), method: :post, class: 'btn btn-primary', data: { turbo: false }
+  - if @checks.any?
+    h2 = t('.recent_checks', default: 'Recent checks')
+    table.table.mt-3
+      thead
+        tr
+          th ID
+          th State
+          th Commit
+          th Exit
+          th Started
+          th Finished
+      tbody
+        - @checks.each do |c|
+          tr
+            td = link_to c.id, repository_check_path(@repository, c)
+            td = c.state
+            td = c.commit_id
+            td = c.exit_status
+            td = l(c.started_at, format: :short) if c.started_at
+            td = l(c.finished_at, format: :short) if c.finished_at
+  - else
+    p.text-muted = t('.no_checks', default: 'No checks yet')

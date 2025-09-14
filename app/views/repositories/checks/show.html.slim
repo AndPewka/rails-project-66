@@ -1,0 +1,26 @@
+.container
+  h1 = t('.title', default: "Check ##{@check.id}")
+  ul
+    li
+      strong State:
+      = @check.state
+    li
+      strong Commit:
+      = @check.commit_id
+    li
+      strong Exit:
+      = @check.exit_status
+    li
+      strong Started:
+      = l(@check.started_at, format: :long) if @check.started_at
+    li
+      strong Finished:
+      = l(@check.finished_at, format: :long) if @check.finished_at
+    - if @check.error.present?
+      li
+        strong Error:
+        = @check.error
+  h2 = t('.output', default: 'Output')
+  pre
+    = @check.stdout.to_s
+  = link_to t('.back', default: 'Back to repository'), repository_path(@repository), class: 'btn btn-link'

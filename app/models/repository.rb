@@ -1,11 +1,139 @@
 # frozen_string_literal: true
 
+require 'open3'
+require 'tmpdir'
+require 'fileutils'
+
 class Repository < ApplicationRecord
   extend Enumerize
 
   belongs_to :user
+  has_many :checks, class_name: 'Repository::Check', dependent: :destroy
+
   enumerize :language, in: %w[Ruby], predicates: true, scope: true
 
   validates :name, :github_id, :full_name, :language, :clone_url, :ssh_url, presence: true
   validates :github_id, uniqueness: true
+
+  def last_check_status
+    checks.order(created_at: :desc).limit(1).pick(:state)
+  end
+
+  class Check < ApplicationRecord
+    self.table_name = 'repository_checks'
+
+    belongs_to :repository
+
+    validates :state, presence: true
+    validates :commit_id, length: { minimum: 7 }, allow_nil: true
+
+    include AASM
+
+    aasm column: :state do
+      state :queued, initial: true
+      state :cloning
+      state :running
+      state :finished
+      state :failed
+
+      event :start do
+        transitions from: :queued, to: :cloning
+      end
+
+      event :run do
+        transitions from: :cloning, to: :running
+      end
+
+      event :succeed do
+        transitions from: :running, to: :finished
+      end
+
+      event :fail do
+        transitions from: %i[queued cloning running], to: :failed
+      end
+    end
+
+    def perform!
+      log = +''
+      update!(started_at: Time.current)
+      start!
+
+      dest = Dir.mktmpdir(['repo_check_', id.to_s], Rails.root.join('tmp'))
+      repo_url = repository.clone_url.presence || repository.ssh_url
+
+      out, code = run_cmd(%w[git clone --quiet] + [repo_url, dest])
+      log << out
+      raise out unless code.zero?
+
+      run!
+
+      if commit_id.present?
+        out, code = run_cmd(%w[git -C] + [dest] + %w[checkout --quiet] + [commit_id])
+        log << out
+        unless code.zero?
+          out2, code2 = run_cmd(%w[git -C] + [dest] + %w[fetch --quiet origin] + [commit_id])
+          log << out2
+          raise out2 unless code2.zero?
+
+          out3, code3 = run_cmd(%w[git -C] + [dest] + %w[checkout --quiet] + [commit_id])
+          log << out3
+          raise out3 unless code3.zero?
+        end
+      else
+        out, code = run_cmd(%w[git -C] + [dest] + %w[rev-parse HEAD])
+        log << out
+        raise out unless code.zero?
+
+        update!(commit_id: out.strip)
+      end
+
+      ruby_files_count = Dir.glob(File.join(dest, '**', '*.rb')).size
+      log << "\nFound #{ruby_files_count} Ruby files under #{dest}\n"
+
+      rubocop_config = Rails.root.join('config/lint/.rubocop.yml')
+      raise "Rubocop config not found at #{rubocop_config}" unless File.exist?(rubocop_config)
+
+      cmd = [
+        'bundle', 'exec', 'rubocop',
+        '--no-server',
+        '--force-exclusion',
+        '--config', rubocop_config.to_s,
+        '--no-color',
+        '--display-cop-names',
+        '--parallel',
+        '.'
+      ]
+
+      out, code = run_cmd(cmd, chdir: dest)
+      log << out
+      update!(stdout: log, exit_status: code)
+
+      if code.zero?
+        succeed!
+      else
+        fail!
+      end
+    rescue StandardError => e
+      update!(error: e.message, stdout: [log, e.message].compact.join("\n"))
+      fail! unless failed?
+    ensure
+      update!(finished_at: Time.current)
+      FileUtils.rm_rf(dest) if defined?(dest) && dest && Dir.exist?(dest)
+    end
+
+    private
+
+    def run_cmd(cmd_argv, chdir: nil)
+      output = +''
+      status = nil
+      opts = {}
+      opts[:chdir] = chdir if chdir
+      Open3.popen3(*Array(cmd_argv), **opts) do |_stdin, stdout, stderr, wait_thr|
+        output << stdout.read.to_s
+        output << stderr.read.to_s
+        status = wait_thr.value.exitstatus
+      end
+      [output, status]
+    end
+  end
 end

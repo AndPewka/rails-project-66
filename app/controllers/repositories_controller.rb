@@ -7,6 +7,11 @@ class RepositoriesController < ApplicationController
     @repositories = current_user ? current_user.repositories.order(:name) : []
   end
 
+  def show
+    @repository = current_user.repositories.find(params[:id])
+    @checks = @repository.checks.order(created_at: :desc).limit(20)
+  end
+
   def new
     client = github_client
     @github_repos = client.repos.select { |r| r.language == 'Ruby' }

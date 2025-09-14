@@ -18,5 +18,9 @@ Rails.application.routes.draw do
   # root "posts#index"
   root 'repositories#index'
 
+  resources :repositories, only: %i[index new create show] do
+    resources :checks, only: %i[create show], module: :repositories
+  end
+
   resources :repositories, only: %i[index new create]
 end
