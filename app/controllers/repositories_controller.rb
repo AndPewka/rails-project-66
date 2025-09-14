@@ -1,4 +1,3 @@
-# app/controllers/repositories_controller.rb
 # frozen_string_literal: true
 
 class RepositoriesController < ApplicationController
@@ -9,14 +8,14 @@ class RepositoriesController < ApplicationController
   end
 
   def new
-    client = octokit_for(current_user)
+    client = github_client
     @github_repos = client.repos.select { |r| r.language == 'Ruby' }
   rescue Octokit::Unauthorized
     redirect_to root_path, alert: t('.github_auth_error')
   end
 
   def create
-    client = octokit_for(current_user)
+    client = github_client
 
     raw = params[:github_id] || params.dig(:repository, :github_id)
     raise ArgumentError, 'missing repo param' if raw.blank?
@@ -48,7 +47,10 @@ class RepositoriesController < ApplicationController
 
   private
 
-  def octokit_for(user)
-    Octokit::Client.new(access_token: user.token, auto_paginate: true)
+  def github_client
+    @github_client ||= ApplicationContainer[:github_client].call(
+      access_token: current_user.token,
+      auto_paginate: true
+    )
   end
 end
