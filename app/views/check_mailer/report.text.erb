@@ -1,0 +1,12 @@
+<%= t('check_mailer.report.title') %>
+
+<%= t('check_mailer.report.repo') %>: <%= @repository.full_name %>
+<%= t('check_mailer.report.commit') %>: <%= @short_sha %><% if @commit_url %> (<%= @commit_url %>)<% end %>
+<%= t('check_mailer.report.status') %>: <%= @check.state %>
+<%= t('check_mailer.report.exit_status') %>: <%= @check.exit_status %>
+<% if @check.error.present? %>
+<%= t('check_mailer.report.error') %>: <%= @check.error %>
+<% end %>
+
+<%= t('check_mailer.report.hint') %>
+<%= t('check_mailer.report.view_check') %>: <%= @check_url %>

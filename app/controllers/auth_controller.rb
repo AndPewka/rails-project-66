@@ -9,7 +9,7 @@ class AuthController < ApplicationController
     auth = request.env['omniauth.auth'] || OmniAuth.config.mock_auth[:github]
     raise 'No auth data' unless auth
 
-    info        = auth['info']        || {}
+    info = auth['info'] || {}
     credentials = auth['credentials'] || {}
 
     email = info['email']&.downcase
@@ -19,10 +19,10 @@ class AuthController < ApplicationController
     token = credentials['token']
 
     user = User.find_or_initialize_by(email: email)
-    user.nickname  = nickname
-    user.name      = name
+    user.nickname = nickname
+    user.name = name
     user.image_url = image_url
-    user.token     = token
+    user.token = token
     user.save!
 
     session[:user_id] = user.id

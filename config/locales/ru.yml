@@ -13,6 +13,18 @@ ru:
       short: "%d.%m.%Y %H:%M"
       long: "%d %B %Y, %H:%M"
 
+  check_mailer:
+    report:
+      subject: "Проверка не прошла: %{repo} @ %{sha}"
+      title: "Отчёт о проверке"
+      repo: "Репозиторий"
+      commit: "Коммит"
+      status: "Статус"
+      exit_status: "Код возврата"
+      error: "Ошибка"
+      hint: "В коде найдены ошибки линтера или проверка завершилась с ошибкой."
+      view_check: "Открыть результат проверки"
+
   layouts:
     application:
       title: "Доска объявлений"

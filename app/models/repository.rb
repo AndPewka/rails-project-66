@@ -103,16 +103,28 @@ class Repository < ApplicationRecord
       end
 
       update!(stdout: log, exit_status: code)
-      code.zero? ? succeed! : fail!
+      if code.zero?
+        succeed!
+      else
+        fail!
+        notify_failure!
+      end
     rescue StandardError => e
       update!(error: e.message, stdout: [log, e.message].compact.join("\n"))
       fail! unless failed?
+      notify_failure!
     ensure
       update!(finished_at: Time.current)
       FileUtils.rm_rf(dest) if defined?(dest) && dest && Dir.exist?(dest)
     end
 
     private
+
+    def notify_failure!
+      CheckMailer.with(check: self).report.deliver_later
+    rescue StandardError => e
+      Rails.logger.warn "CheckMailer failed: #{e.class}: #{e.message}"
+    end
 
     def run_rubocop(dest)
       rubocop_config = Rails.root.join('config/lint/.rubocop.yml')
