@@ -76,7 +76,7 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
 
     fake = Minitest::Mock.new
     fake.expect :repo, Repo.new(
-      id: 99_002, name: 'node', full_name: 'me/node', language: 'JavaScript',
+      id: 99_002, name: 'node', full_name: 'me/node', language: 'Python',
       clone_url: 'https://github.com/me/node.git',
       ssh_url: 'git@github.com:me/node.git'
     ), ['me/node']
@@ -94,9 +94,9 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
     user = users(:one)
     sign_in(user)
 
-    ruby1 = Repo.new(id: 1001, name: 'r1', full_name: 'me/r1', language: 'Ruby',       clone_url: '', ssh_url: '')
-    js    = Repo.new(id: 1002, name: 'j1', full_name: 'me/j1', language: 'JavaScript', clone_url: '', ssh_url: '')
-    ruby2 = Repo.new(id: 1003, name: 'r2', full_name: 'me/r2', language: 'Ruby',       clone_url: '', ssh_url: '')
+    ruby1 = Repo.new(id: 1001, name: 'r1', full_name: 'me/r1', language: 'Ruby', clone_url: '', ssh_url: '')
+    js    = Repo.new(id: 1002, name: 'j1', full_name: 'me/j1', language: 'Python', clone_url: '', ssh_url: '')
+    ruby2 = Repo.new(id: 1003, name: 'r2', full_name: 'me/r2', language: 'Ruby', clone_url: '', ssh_url: '')
 
     fake = Minitest::Mock.new
     fake.expect :repos, [ruby1, js, ruby2]

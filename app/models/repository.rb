@@ -10,7 +10,7 @@ class Repository < ApplicationRecord
   belongs_to :user
   has_many :checks, class_name: 'Repository::Check', dependent: :destroy
 
-  enumerize :language, in: %w[Ruby], predicates: true, scope: true
+  enumerize :language, in: %w[Ruby JavaScript], predicates: true, scope: true
 
   validates :name, :github_id, :full_name, :language, :clone_url, :ssh_url, presence: true
   validates :github_id, uniqueness: true
@@ -87,9 +87,34 @@ class Repository < ApplicationRecord
         update!(commit_id: out.strip)
       end
 
-      ruby_files_count = Dir.glob(File.join(dest, '**', '*.rb')).size
-      log << "\nFound #{ruby_files_count} Ruby files under #{dest}\n"
+      case repository.language
+      when 'Ruby'
+        rb_count = Dir.glob(File.join(dest, '**', '*.rb')).size
+        log << "\nFound #{rb_count} Ruby files under #{dest}\n"
+        out, code = run_rubocop(dest)
+        log << out
+      when 'JavaScript'
+        js_count = Dir.glob(File.join(dest, '**', '*.{js,jsx,mjs,cjs}')).size
+        log << "\nFound #{js_count} JS files under #{dest}\n"
+        out, code = run_eslint(dest)
+        log << out
+      else
+        raise "Unsupported language: #{repository.language}"
+      end
 
+      update!(stdout: log, exit_status: code)
+      code.zero? ? succeed! : fail!
+    rescue StandardError => e
+      update!(error: e.message, stdout: [log, e.message].compact.join("\n"))
+      fail! unless failed?
+    ensure
+      update!(finished_at: Time.current)
+      FileUtils.rm_rf(dest) if defined?(dest) && dest && Dir.exist?(dest)
+    end
+
+    private
+
+    def run_rubocop(dest)
       rubocop_config = Rails.root.join('config/lint/.rubocop.yml')
       raise "Rubocop config not found at #{rubocop_config}" unless File.exist?(rubocop_config)
 
@@ -103,36 +128,65 @@ class Repository < ApplicationRecord
         '--parallel',
         '.'
       ]
-
-      out, code = run_cmd(cmd, chdir: dest)
-      log << out
-      update!(stdout: log, exit_status: code)
-
-      if code.zero?
-        succeed!
-      else
-        fail!
-      end
-    rescue StandardError => e
-      update!(error: e.message, stdout: [log, e.message].compact.join("\n"))
-      fail! unless failed?
-    ensure
-      update!(finished_at: Time.current)
-      FileUtils.rm_rf(dest) if defined?(dest) && dest && Dir.exist?(dest)
+      run_cmd(cmd, chdir: dest)
     end
 
-    private
+    def run_eslint(dest)
+      eslint_config = Rails.root.join('config/lint/.eslintrc.json')
+      raise "ESLint config not found at #{eslint_config}" unless File.exist?(eslint_config)
 
-    def run_cmd(cmd_argv, chdir: nil)
+      args = [
+        '--no-eslintrc',
+        '--config', eslint_config.to_s,
+        '--format', 'json',
+        '--ext', '.js,.jsx,.mjs,.cjs',
+        '--ignore-pattern', 'node_modules/**',
+        '--ignore-pattern', 'dist/**',
+        dest.to_s
+      ]
+
+      local_bin = Rails.root.join('node_modules/.bin/eslint').to_s
+      if File.exist?(local_bin)
+        ver_out, ver_code = run_cmd([local_bin, '-v'])
+        if ver_code.zero? && ver_out.to_s[/\d+/].to_i < 9
+          return run_cmd([local_bin] + args)
+        end
+      end
+
+      run_cmd(
+        ['npx', '--yes', 'eslint@8.57.0'] + args,
+        env: {
+          'NPM_CONFIG_LOGLEVEL' => 'error',
+          'npm_config_loglevel' => 'error',
+          'NO_UPDATE_NOTIFIER' => '1',
+          'npm_config_fund' => 'false',
+          'npm_config_audit' => 'false'
+        }
+      )
+    rescue Errno::ENOENT
+      raise 'ESLint требует Node.js (npm/npx). Поставь Node 18+ или добавь eslint@8 в devDependencies.'
+    end
+
+    def run_cmd(cmd_argv, chdir: nil, env: nil)
       output = +''
       status = nil
       opts = {}
       opts[:chdir] = chdir if chdir
-      Open3.popen3(*Array(cmd_argv), **opts) do |_stdin, stdout, stderr, wait_thr|
-        output << stdout.read.to_s
-        output << stderr.read.to_s
-        status = wait_thr.value.exitstatus
+
+      if env && env.any?
+        Open3.popen3(env, *Array(cmd_argv), **opts) do |_stdin, stdout, stderr, wait_thr|
+          output << stdout.read.to_s
+          output << stderr.read.to_s
+          status = wait_thr.value.exitstatus
+        end
+      else
+        Open3.popen3(*Array(cmd_argv), **opts) do |_stdin, stdout, stderr, wait_thr|
+          output << stdout.read.to_s
+          output << stderr.read.to_s
+          status = wait_thr.value.exitstatus
+        end
       end
+
       [output, status]
     end
   end

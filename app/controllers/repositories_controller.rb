@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class RepositoriesController < ApplicationController
+  SUPPORTED_LANGUAGES = %w[Ruby JavaScript].freeze
   before_action :require_login, only: %i[new create]
 
   def index
@@ -14,7 +15,7 @@ class RepositoriesController < ApplicationController
 
   def new
     client = github_client
-    @github_repos = client.repos.select { |r| r.language == 'Ruby' }
+    @github_repos = client.repos.select { |r| SUPPORTED_LANGUAGES.include?(r.language) }
   rescue Octokit::Unauthorized
     redirect_to root_path, alert: t('.github_auth_error')
   end
@@ -28,8 +29,8 @@ class RepositoriesController < ApplicationController
     identifier = raw.to_s.match?(/\A\d+\z/) ? raw.to_i : raw
     gh_repo = client.repo(identifier)
 
-    unless gh_repo.language == 'Ruby'
-      redirect_to new_repository_path, alert: t('.only_ruby') and return
+    unless SUPPORTED_LANGUAGES.include?(gh_repo.language)
+      redirect_to new_repository_path, alert: t('.only_supported') and return
     end
 
     repo = current_user.repositories.find_or_initialize_by(github_id: gh_repo.id)
