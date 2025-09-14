@@ -124,7 +124,7 @@ class Repository < ApplicationRecord
         '--force-exclusion',
         '--config', rubocop_config.to_s,
         '--no-color',
-        '--display-cop-names',
+        '--format', 'json',
         '--parallel',
         '.'
       ]
@@ -173,7 +173,7 @@ class Repository < ApplicationRecord
       opts = {}
       opts[:chdir] = chdir if chdir
 
-      if env && env.any?
+      if env&.any?
         Open3.popen3(env, *Array(cmd_argv), **opts) do |_stdin, stdout, stderr, wait_thr|
           output << stdout.read.to_s
           output << stderr.read.to_s

@@ -6,19 +6,13 @@
         thead
           tr
             th = t('.name')
-            th = t('.full_name')
             th = t('.language')
-            th = t('.clone_url')
-            th = t('.ssh_url')
-            th Status
+            th = t('.status')
         tbody
           - @repositories.each do |r|
             tr
               td = link_to r.name, repository_path(r)
-              td = r.full_name
               td = r.language
-              td = link_to r.clone_url, r.clone_url, target: '_blank', rel: 'noopener'
-              td = r.ssh_url
               td = r.last_check_status
     - else
       p.text-muted = t('.empty')

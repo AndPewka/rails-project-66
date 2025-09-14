@@ -1,26 +1,49 @@
 .container
-  h1 = t('.title', default: "Check ##{@check.id}")
+  h1 = t('.title')
+
   ul
     li
-      strong State:
+      strong = t('.created_at')
+      | :
+      = l(@check.created_at, format: :long)
+    li
+      strong = t('.status')
+      | :
       = @check.state
     li
-      strong Commit:
-      = @check.commit_id
+      strong = t('.passed')
+      | :
+      = @passed ? 'true' : 'false'
     li
-      strong Exit:
-      = @check.exit_status
+      strong = t('.offenses')
+      | :
+      = @offenses_count
     li
-      strong Started:
-      = l(@check.started_at, format: :long) if @check.started_at
-    li
-      strong Finished:
-      = l(@check.finished_at, format: :long) if @check.finished_at
-    - if @check.error.present?
-      li
-        strong Error:
-        = @check.error
-  h2 = t('.output', default: 'Output')
-  pre
-    = @check.stdout.to_s
-  = link_to t('.back', default: 'Back to repository'), repository_path(@repository), class: 'btn btn-link'
+      strong = t('.commit')
+      | :
+      - if @check.commit_id.present?
+        = link_to @check.commit_id, "https://github.com/#{@repository.full_name}/commit/#{@check.commit_id}", target: '_blank', rel: 'noopener'
+      - else
+        = '-'
+
+  - if @entries.any?
+    h2 = t('.issues')
+    table.table.table-striped.mt-3
+      thead
+        tr
+          th = t('.file')
+          th = t('.message')
+          th = t('.rule')
+          th = t('.linecol')
+      tbody
+        - @entries.each do |e|
+          tr
+            td = e[:path]
+            td = e[:message]
+            td = e[:rule]
+            td = e[:loc]
+  - else
+    h2 = t('.output')
+    pre = @check.stdout.to_s
+
+  = link_to t('.back'), repository_path(@repository), class: 'btn btn-link'

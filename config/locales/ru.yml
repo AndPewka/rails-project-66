@@ -14,6 +14,8 @@ ru:
       long: "%d %B %Y, %H:%M"
 
   layouts:
+    application:
+      title: "Доска объявлений"
     header:
       brand: "Главная"
       login_github: "Войти с GitHub"
@@ -24,10 +26,7 @@ ru:
       status: "Статус"
       title: "Мои репозитории"
       name: "Имя"
-      full_name: "Полное имя"
       language: "Язык"
-      clone_url: "Clone (HTTPS)"
-      ssh_url: "SSH"
       add: "Добавить репозиторий"
       empty: "Пока нет репозиториев"
       sign_in_to_view: "Войдите через GitHub, чтобы просматривать свои репозитории"
@@ -36,18 +35,40 @@ ru:
       run_check: "Запустить проверку"
       recent_checks: "Последние проверки"
       no_checks: "Проверок ещё нет"
+      th_id: "ID"
+      th_state: "Статус"
+      th_commit: "Коммит"
+      th_exit: "Код выхода"
+      th_started: "Начало"
+      th_finished: "Окончание"
 
     new:
       title: "Добавление репозитория"
-      select_repo: "Выберите репозиторий (Ruby)"
+      select_repo: "Выберите репозиторий (Ruby/JS)"
       add: "Добавить"
-      no_repos: "У вас нет репозиториев на GitHub или они не на Ruby."
+      no_repos: "У вас нет репозиториев на GitHub или они не на Ruby/JS."
       github_auth_error: "Ошибка авторизации GitHub"
 
     create:
       created: "Репозиторий добавлен"
       not_found: "Репозиторий не найден"
-      only_ruby: "Добавлять можно только репозитории на Ruby"
+      only_supported: "Добавлять можно только репозитории на Ruby или JavaScript"
+
+    checks:
+      show:
+        title: "Проверка"
+        created_at: "Дата создания"
+        status: "Статус"
+        passed: "Проверка пройдена"
+        offenses: "Количество замечаний"
+        commit: "ID коммита"
+        issues: "Сообщение"
+        file: "Файл"
+        message: "Сообщение"
+        rule: "Идентификатор правила"
+        linecol: "Строка и символ"
+        output: "Вывод"
+        back: "Назад к репозиторию"
 
   auth:
     signed_in: "Вы вошли в систему"
