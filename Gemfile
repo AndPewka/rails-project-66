@@ -26,6 +26,8 @@ gem 'slim-rails'
 gem 'enumerize'
 gem 'octokit'
 
+gem 'aasm'
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 
@@ -44,6 +46,9 @@ gem 'bootsnap', require: false
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-rails_csrf_protection'
+
+gem 'dry-auto_inject'
+gem 'dry-container'
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
@@ -75,4 +80,5 @@ group :test do
   gem 'capybara'
   gem 'minitest-power_assert'
   gem 'selenium-webdriver'
+  gem 'webmock'
 end

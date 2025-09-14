@@ -4,6 +4,7 @@ require 'test_helper'
 require 'minitest/mock'
 require 'omniauth'
 require 'omniauth/auth_hash'
+require 'dry/container/stub'
 
 class RepositoriesControllerTest < ActionDispatch::IntegrationTest
   fixtures :users
@@ -31,18 +32,9 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
     other = users(:two)
     sign_in(user)
 
-    user.repositories.create!(
-      github_id: 10_001, name: 'mine-1', full_name: 'me/mine-1',
-      language: 'Ruby', clone_url: 'https://ex/m1', ssh_url: 'git@ex:m1.git'
-    )
-    user.repositories.create!(
-      github_id: 10_002, name: 'mine-2', full_name: 'me/mine-2',
-      language: 'Ruby', clone_url: 'https://ex/m2', ssh_url: 'git@ex:m2.git'
-    )
-    other.repositories.create!(
-      github_id: 10_003, name: 'other', full_name: 'you/other',
-      language: 'Ruby', clone_url: 'https://ex/o', ssh_url: 'git@ex:o.git'
-    )
+    user.repositories.create!(github_id: 10_001, name: 'mine-1', full_name: 'me/mine-1', language: 'Ruby', clone_url: 'https://ex/m1', ssh_url: 'git@ex:m1.git')
+    user.repositories.create!(github_id: 10_002, name: 'mine-2', full_name: 'me/mine-2', language: 'Ruby', clone_url: 'https://ex/m2', ssh_url: 'git@ex:m2.git')
+    other.repositories.create!(github_id: 10_003, name: 'other', full_name: 'you/other', language: 'Ruby', clone_url: 'https://ex/o', ssh_url: 'git@ex:o.git')
 
     get repositories_path
     assert_response :success
@@ -64,7 +56,7 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
       ssh_url: 'git@github.com:me/rails.git'
     ), ['me/rails']
 
-    Octokit::Client.stub :new, fake do
+    ApplicationContainer.stub(:github_client, ->(**) { fake }) do
       assert_difference -> { user.repositories.count }, +1 do
         post repositories_path, params: { github_id: 'me/rails' }
       end
@@ -89,7 +81,7 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
       ssh_url: 'git@github.com:me/node.git'
     ), ['me/node']
 
-    Octokit::Client.stub :new, fake do
+    ApplicationContainer.stub(:github_client, ->(**) { fake }) do
       assert_no_difference -> { user.repositories.count } do
         post repositories_path, params: { github_id: 'me/node' }
       end
@@ -109,7 +101,7 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
     fake = Minitest::Mock.new
     fake.expect :repos, [ruby1, js, ruby2]
 
-    Octokit::Client.stub :new, fake do
+    ApplicationContainer.stub(:github_client, ->(**) { fake }) do
       get new_repository_path
     end
 
@@ -127,7 +119,7 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
     fake = Object.new
     def fake.repo(_) = raise(Octokit::InvalidRepository)
 
-    Octokit::Client.stub :new, fake do
+    ApplicationContainer.stub(:github_client, ->(**) { fake }) do
       post repositories_path, params: { github_id: 'bad-format' }
     end
 
