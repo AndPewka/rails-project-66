@@ -415,7 +415,7 @@ DEPENDENCIES
   slim-rails
   slim_lint
   sprockets-rails
-  sqlite3 (>= 1.4)
+  sqlite3 (~> 2.7)
   stimulus-rails
   turbo-rails
   tzinfo-data
