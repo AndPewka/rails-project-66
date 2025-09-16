@@ -166,6 +166,7 @@ GEM
     marcel (1.0.4)
     matrix (0.4.3)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.9)
     minitest (5.25.5)
     minitest-power_assert (0.3.1)
       minitest
@@ -185,6 +186,9 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.4)
+    nokogiri (1.18.9)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-gnu)
       racc (~> 1.4)
     oauth2 (2.0.12)
@@ -340,6 +344,8 @@ GEM
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
+    sqlite3 (2.7.3)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (2.7.3-x86_64-linux-gnu)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
@@ -378,6 +384,7 @@ GEM
     zeitwerk (2.7.3)
 
 PLATFORMS
+  ruby
   x86_64-linux
 
 DEPENDENCIES
