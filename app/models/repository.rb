@@ -16,7 +16,7 @@ class Repository < ApplicationRecord
   validates :github_id, uniqueness: true
 
   def last_check_status
-    checks.order(created_at: :desc).limit(1).pick(:state)
+    checks.order(created_at: :desc).limit(1).pick(:aasm_state)
   end
 
   class Check < ApplicationRecord
@@ -24,12 +24,11 @@ class Repository < ApplicationRecord
 
     belongs_to :repository
 
-    validates :state, presence: true
     validates :commit_id, length: { minimum: 7 }, allow_nil: true
 
     include AASM
 
-    aasm column: :state do
+    aasm column: :aasm_state do
       state :queued, initial: true
       state :cloning
       state :running
@@ -37,7 +36,7 @@ class Repository < ApplicationRecord
       state :failed
 
       event :start do
-        transitions from: :queued, to: :cloning
+        transitions from: :queued,  to: :cloning
       end
 
       event :run do
@@ -52,6 +51,10 @@ class Repository < ApplicationRecord
         transitions from: %i[queued cloning running], to: :failed
       end
     end
+
+    alias_attribute :state, :aasm_state
+
+    validates :aasm_state, presence: true
 
     def perform!
       log = +''
@@ -104,13 +107,15 @@ class Repository < ApplicationRecord
 
       update!(stdout: log, exit_status: code)
       if code.zero?
+        update!(passed: true)
         succeed!
       else
+        update!(passed: false)
         fail!
         notify_failure!
       end
     rescue StandardError => e
-      update!(error: e.message, stdout: [log, e.message].compact.join("\n"))
+      update!(error: e.message, stdout: [log, e.message].compact.join("\n"), passed: false)
       fail! unless failed?
       notify_failure!
     ensure

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_14_064750) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_16_033309) do
   create_table "repositories", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "name"
@@ -28,7 +28,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_14_064750) do
   create_table "repository_checks", force: :cascade do |t|
     t.integer "repository_id", null: false
     t.string "commit_id"
-    t.string "state", default: "queued", null: false
+    t.string "aasm_state", default: "queued", null: false
     t.text "stdout"
     t.integer "exit_status"
     t.text "error"
@@ -36,6 +36,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_14_064750) do
     t.datetime "finished_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "passed", default: false, null: false
     t.index ["repository_id", "created_at"], name: "index_repository_checks_on_repository_id_and_created_at"
     t.index ["repository_id"], name: "index_repository_checks_on_repository_id"
   end
