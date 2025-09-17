@@ -18,6 +18,9 @@ class RepositoriesController < ApplicationController
     @github_repos = client.repos.select { |r| SUPPORTED_LANGUAGES.include?(r.language) }
   rescue Octokit::Unauthorized
     redirect_to root_path, alert: t('.github_auth_error')
+  rescue StandardError => e
+    Rails.logger.info "GitHub API unavailable (#{e.class}): #{e.message}"
+    @github_repos = []
   end
 
   def create
@@ -49,6 +52,9 @@ class RepositoriesController < ApplicationController
       redirect_to new_repository_path, alert: repo.errors.full_messages.to_sentence
     end
   rescue Octokit::NotFound, Octokit::InvalidRepository
+    redirect_to new_repository_path, alert: t('.not_found')
+  rescue StandardError => e
+    Rails.logger.info "GitHub API unavailable (#{e.class}): #{e.message}"
     redirect_to new_repository_path, alert: t('.not_found')
   end
 

@@ -14,9 +14,11 @@ module Repositories
 
       stdout = @check.stdout.to_s
       case @repository.language
-      when 'Ruby' then ruby_output stdout
-      when 'JavaScript' then javascript_output stdout
-      else raise 'Undefined checkRepo language'
+      when 'Ruby'        then ruby_output stdout
+      when 'JavaScript'  then javascript_output stdout
+      else
+        ruby_output stdout
+        javascript_output stdout if @entries.empty?
       end
     end
 
