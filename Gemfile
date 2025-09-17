@@ -50,6 +50,8 @@ gem 'omniauth-rails_csrf_protection'
 gem 'dry-auto_inject'
 gem 'dry-container'
 
+gem 'rubocop'
+
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 group :production do
@@ -66,7 +68,6 @@ group :development, :test do
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem 'brakeman', require: false
   gem 'faker'
-  gem 'rubocop', require: false
   gem 'slim_lint'
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
