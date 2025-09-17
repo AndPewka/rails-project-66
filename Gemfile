@@ -61,7 +61,7 @@ group :development, :test do
   gem 'debug', platforms: %i[mri mingw x64_mingw], require: 'debug/prelude'
   gem 'dotenv-rails'
 
-  gem 'sqlite3', '~> 2.7'
+  gem 'sqlite3', '~> 1.4'
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem 'brakeman', require: false
