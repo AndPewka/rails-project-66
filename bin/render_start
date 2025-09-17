@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+echo "===> Running migrations & seeds"
+bundle exec rails db:prepare
+bundle exec rails db:seed
+
+echo "===> Starting Puma"
+exec bundle exec puma -C config/puma.rb
