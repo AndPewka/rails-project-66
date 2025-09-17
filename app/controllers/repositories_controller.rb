@@ -10,7 +10,7 @@ class RepositoriesController < ApplicationController
 
   def show
     @repository = current_user.repositories.find(params[:id])
-    @checks     = @repository.checks.order(created_at: :desc).limit(20)
+    @checks = @repository.checks.order(created_at: :desc).limit(20)
   end
 
   def new
