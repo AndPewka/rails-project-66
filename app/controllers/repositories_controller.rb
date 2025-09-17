@@ -61,6 +61,7 @@ class RepositoriesController < ApplicationController
   private
 
   def install_github_webhook!(client, full_name)
+    return if Rails.env.test?
     return if Rails.application.routes.default_url_options[:host].blank?
 
     url_helpers = Rails.application.routes.url_helpers
