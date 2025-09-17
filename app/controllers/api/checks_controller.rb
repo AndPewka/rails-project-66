@@ -31,7 +31,8 @@ module Api
       check = repo.checks.create!(commit_id: commit_sha)
       check.perform!
 
-      render json: { id: check.id, state: check.state, exit: check.exit_status }, status: :created
+      status_code = event == 'push' ? :created : :ok
+      render json: { id: check.id, state: check.state, exit: check.exit_status }, status: status_code
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'repository_not_found' }, status: :not_found
     rescue StandardError => e
