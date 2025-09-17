@@ -28,14 +28,14 @@ module Web
     end
 
     def upsert_user(auth)
-      info        = auth['info'] || {}
+      info = auth['info'] || {}
       credentials = auth['credentials'] || {}
 
-      email     = info['email']&.downcase
-      nickname  = info['nickname']
-      name      = preferred_name(info['name'], nickname, auth['uid'])
+      email = info['email']&.downcase
+      nickname = info['nickname']
+      name = preferred_name(info['name'], nickname, auth['uid'])
       image_url = info['image']
-      token     = credentials['token']
+      token = credentials['token']
 
       user = User.find_or_initialize_by(email: email)
       user.assign_attributes(

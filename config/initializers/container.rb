@@ -13,13 +13,13 @@ if Rails.env.test?
 
     def repo(identifier)
       if identifier.to_s.match?(/\A\d+\z/)
-        id        = identifier.to_i
+        id = identifier.to_i
         full_name = "hexlet-repos/#{id}"
-        name      = "repo-#{id}"
+        name = "repo-#{id}"
       else
         full_name = identifier.to_s
-        name      = full_name.split('/').last || full_name
-        id        = 0
+        name = full_name.split('/').last || full_name
+        id = 0
       end
 
       Repo.new(

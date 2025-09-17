@@ -10,12 +10,12 @@ class RepositoriesController < ApplicationController
 
   def show
     @repository = current_user.repositories.find(params[:id])
-    @checks = @repository.checks.order(created_at: :desc).limit(20)
+    @checks     = @repository.checks.order(created_at: :desc).limit(20)
   end
 
   def new
     client = github_client
-    @github_repos = client.repos.select { |r| SUPPORTED_LANGUAGES.include?(r.language) }
+    @github_repos = client.repos.select { |r| supported_language?(r.language) }
   rescue Octokit::Unauthorized
     redirect_to root_path, alert: t('.github_auth_error')
   rescue StandardError => e
@@ -24,33 +24,7 @@ class RepositoriesController < ApplicationController
   end
 
   def create
-    client = github_client
-
-    raw = params[:github_id] || params.dig(:repository, :github_id)
-    raise ArgumentError, 'missing repo param' if raw.blank?
-
-    identifier = raw.to_s.match?(/\A\d+\z/) ? raw.to_i : raw
-    gh_repo = client.repo(identifier)
-
-    unless SUPPORTED_LANGUAGES.include?(gh_repo.language)
-      redirect_to new_repository_path, alert: t('.only_supported') and return
-    end
-
-    repo = current_user.repositories.find_or_initialize_by(github_id: gh_repo.id)
-    repo.assign_attributes(
-      name: gh_repo.name,
-      full_name: gh_repo.full_name,
-      language: gh_repo.language,
-      clone_url: gh_repo.clone_url,
-      ssh_url: gh_repo.ssh_url
-    )
-
-    if repo.save
-      install_github_webhook!(client, gh_repo.full_name)
-      redirect_to repositories_path, notice: t('.created')
-    else
-      redirect_to new_repository_path, alert: repo.errors.full_messages.to_sentence
-    end
+    perform_create!
   rescue Octokit::NotFound, Octokit::InvalidRepository
     redirect_to new_repository_path, alert: t('.not_found')
   rescue StandardError => e
@@ -59,6 +33,43 @@ class RepositoriesController < ApplicationController
   end
 
   private
+
+  def perform_create!
+    client = github_client
+    identifier = repo_identifier!
+
+    gh_repo = client.repo(identifier)
+    return redirect_to(new_repository_path, alert: t('.only_supported')) unless supported_language?(gh_repo.language)
+
+    repo = build_repo_from_github(gh_repo)
+    if repo.save
+      install_github_webhook!(client, gh_repo.full_name)
+      redirect_to repositories_path, notice: t('.created')
+    else
+      redirect_to new_repository_path, alert: repo.errors.full_messages.to_sentence
+    end
+  end
+
+  def repo_identifier!
+    raw = params[:github_id] || params.dig(:repository, :github_id)
+    raise ArgumentError, 'missing repo param' if raw.blank?
+
+    raw.to_s.match?(/\A\d+\z/) ? raw.to_i : raw
+  end
+
+  def supported_language?(lang)
+    SUPPORTED_LANGUAGES.include?(lang)
+  end
+
+  def build_repo_from_github(gh_repo)
+    current_user.repositories.find_or_initialize_by(github_id: gh_repo.id).tap do |repo|
+      repo.name = gh_repo.name
+      repo.full_name = gh_repo.full_name
+      repo.language = gh_repo.language
+      repo.clone_url = gh_repo.clone_url
+      repo.ssh_url = gh_repo.ssh_url
+    end
+  end
 
   def install_github_webhook!(client, full_name)
     return if Rails.env.test?

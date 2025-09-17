@@ -6,29 +6,24 @@ require 'omniauth'
 require 'omniauth/auth_hash'
 require 'dry/container/stub'
 
+Repo = Struct.new(:id, :name, :full_name, :language, :clone_url, :ssh_url, keyword_init: true)
+
 class RepositoriesControllerTest < ActionDispatch::IntegrationTest
   fixtures :users
-
-  Repo = Struct.new(:id, :name, :full_name, :language, :clone_url, :ssh_url, keyword_init: true)
 
   def sign_in(user)
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(
       provider: 'github',
       uid: 'u1',
-      info: {
-        email: user.email,
-        nickname: user.nickname,
-        name: user.name,
-        image: nil
-      },
+      info: { email: user.email, nickname: user.nickname, name: user.name, image: nil },
       credentials: { token: user.token.presence || 'test-token' }
     )
     get '/auth/github/callback'
   end
 
   test 'index shows only current user repositories' do
-    user  = users(:one)
+    user = users(:one)
     other = users(:two)
     sign_in(user)
 
@@ -55,14 +50,9 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
       clone_url: 'https://github.com/me/rails.git',
       ssh_url: 'git@github.com:me/rails.git'
     ), ['me/rails']
-
     fake.expect :create_hook, true do |full_name, hook, config, **opts|
-      full_name == 'me/rails' &&
-        hook == 'web' &&
-        config.is_a?(Hash) &&
-        config[:url].to_s.include?('/api/checks') &&
-        opts[:events] == ['push'] &&
-        opts[:active] == true
+      full_name == 'me/rails' && hook == 'web' && config.is_a?(Hash) &&
+        config[:url].to_s.include?('/api/checks') && opts[:events] == ['push'] && opts[:active] == true
     end
 
     ApplicationContainer.stub(:github_client, ->(**) { fake }) do
@@ -104,7 +94,7 @@ class RepositoriesControllerTest < ActionDispatch::IntegrationTest
     sign_in(user)
 
     ruby1 = Repo.new(id: 1001, name: 'r1', full_name: 'me/r1', language: 'Ruby', clone_url: '', ssh_url: '')
-    js    = Repo.new(id: 1002, name: 'j1', full_name: 'me/j1', language: 'Python', clone_url: '', ssh_url: '')
+    js = Repo.new(id: 1002, name: 'j1', full_name: 'me/j1', language: 'Python', clone_url: '', ssh_url: '')
     ruby2 = Repo.new(id: 1003, name: 'r2', full_name: 'me/r2', language: 'Ruby', clone_url: '', ssh_url: '')
 
     fake = Minitest::Mock.new
