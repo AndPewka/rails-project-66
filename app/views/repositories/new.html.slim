@@ -14,4 +14,3 @@
                 options_for_select(@github_repos.map { |r| ["#{r.full_name} (#{r.language})", r.full_name] }),
                 class: 'form-select'
       = submit_tag t('.add'), class: 'btn btn-primary'
-

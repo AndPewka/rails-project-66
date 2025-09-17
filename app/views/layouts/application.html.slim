@@ -9,8 +9,9 @@ html
   body
     = render 'layouts/header'
 
+    - bs_map = { notice: 'success', alert: 'danger' }
     - flash.each do |type, message|
-      - bs = { notice: 'success', alert: 'danger' }[type.to_sym] || 'info'
+      - bs = bs_map[type.to_sym] || 'info'
       .container
         .alert class="alert-#{bs}" role="alert" = message
 
