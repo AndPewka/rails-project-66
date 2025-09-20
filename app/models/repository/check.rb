@@ -9,20 +9,13 @@ class Repository::Check < ApplicationRecord
   validates :aasm_state, presence: true
 
   include AASM
-  include RepoChecks::Git
-  include RepoChecks::Lint
-  include RepoChecks::Shell
-  include RepoChecks::Notifications
 
   aasm column: :aasm_state do
     state :queued, initial: true
-    state :cloning
-    state :running
-    state :finished
-    state :failed
+    state :cloning, :running, :finished, :failed
 
     event :start do
-      transitions from: :queued,  to: :cloning
+      transitions from: :queued, to: :cloning
     end
 
     event :run do
@@ -39,63 +32,4 @@ class Repository::Check < ApplicationRecord
   end
 
   alias_attribute :state, :aasm_state
-
-  def perform!
-    @log = +''
-    update!(started_at: Time.current)
-
-    return fast_path! if Rails.env.test?
-
-    start!
-    dest = make_workspace
-    begin
-      clone_repo!(dest)
-      run!
-      checkout_target_commit!(dest)
-      code = lint_workspace(dest)
-      finalize!(code)
-    rescue StandardError => e
-      handle_failure!(e)
-    ensure
-      update!(finished_at: Time.current)
-      cleanup_dir(dest)
-    end
-  end
-
-  private
-
-  def fast_path!
-    start!
-    run!
-    append_log "[test] fast path\n"
-    update!(stdout: @log, exit_status: 0, passed: true)
-    succeed!
-    update!(finished_at: Time.current)
-  end
-
-  def make_workspace
-    Dir.mktmpdir(['repo_check_', id.to_s], Rails.root.join('tmp'))
-  end
-
-  def finalize!(code)
-    update!(stdout: @log, exit_status: code)
-    if code.zero?
-      update!(passed: true)
-      succeed!
-    else
-      update!(passed: false)
-      fail!
-      notify_failure!
-    end
-  end
-
-  def handle_failure!(error)
-    update!(error: error.message, stdout: [@log, error.message].compact.join("\n"), passed: false)
-    fail! unless failed?
-    notify_failure!
-  end
-
-  def append_log(str)
-    @log << str.to_s
-  end
 end

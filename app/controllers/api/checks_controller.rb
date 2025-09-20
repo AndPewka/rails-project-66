@@ -10,7 +10,7 @@ module Api
       payload = raw_payload
       repo = find_repo!(payload)
       check = repo.checks.create!(commit_id: commit_sha(payload))
-      check.perform!
+      CheckRepositoryService.new(check).call
 
       render json: { id: check.id, state: check.state, exit: check.exit_status }, status: response_status
     rescue ActiveRecord::RecordNotFound

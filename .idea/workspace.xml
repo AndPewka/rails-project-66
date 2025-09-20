@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a5b38a95-74c8-458f-9380-60c4e3c0b142" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/models/repository/check/git.rb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/repository/check/lint.rb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/repository/check/notifications.rb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/repository/check/shell.rb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/api/checks_controller.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/api/checks_controller.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/repositories/checks_controller.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/repositories/checks_controller.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/repository/check.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/repository/check.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/user.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/user.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/environments/development.rb" beforeDir="false" afterPath="$PROJECT_DIR$/config/environments/development.rb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +45,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Rails.rails-project-66.executor": "Debug",
     "RailsCreateViewFileDialog.DEFAULT_TEMPLATE": "Slim File",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -62,7 +65,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Test::Unit/Shoulda/Minitest.ApiChecksTest">
+  <component name="RunManager" selected="Rails.rails-project-66">
     <configuration name="rails-project-66" type="RailsRunConfigurationType" factoryName="Rails">
       <module name="rails-project-66" />
       <predefined_log_file enabled="true" id="RUBY_RAILS_SERVER" />
@@ -230,7 +233,7 @@
       <workItem from="1757993182464" duration="5502000" />
       <workItem from="1758077671639" duration="6793000" />
       <workItem from="1758088214896" duration="5494000" />
-      <workItem from="1758338517244" duration="702000" />
+      <workItem from="1758338517244" duration="1640000" />
     </task>
     <servers />
   </component>
@@ -238,6 +241,7 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/rails_project_66@rails_project_66.rcov" NAME="rails-project-66 Coverage Results" MODIFIED="1758339944199" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="rcov" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" MODULE_NAME="rails-project-66" />
     <SUITE FILE_PATH="coverage/rails_project_66@RepositoriesControllerTest.rcov" NAME="RepositoriesControllerTest Coverage Results" MODIFIED="1757832139546" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="rcov" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" MODULE_NAME="rails-project-66" />
     <SUITE FILE_PATH="coverage/rails_project_66@ApiChecksTest.rcov" NAME="ApiChecksTest Coverage Results" MODIFIED="1758078524618" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="rcov" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" MODULE_NAME="rails-project-66" />
   </component>
