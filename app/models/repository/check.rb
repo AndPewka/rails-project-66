@@ -9,10 +9,10 @@ class Repository::Check < ApplicationRecord
   validates :aasm_state, presence: true
 
   include AASM
-  include Repository::Check::Git
-  include Repository::Check::Lint
-  include Repository::Check::Shell
-  include Repository::Check::Notifications
+  include RepoChecks::Git
+  include RepoChecks::Lint
+  include RepoChecks::Shell
+  include RepoChecks::Notifications
 
   aasm column: :aasm_state do
     state :queued, initial: true
