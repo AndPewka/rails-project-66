@@ -62,7 +62,7 @@ class CheckRepositoryService
     else
       check.update!(passed: false)
       check.fail!
-      notify_failure!
+      notify_failure! check
     end
   end
 
@@ -71,7 +71,7 @@ class CheckRepositoryService
                   stdout: [@log, error.message].compact.join("\n"),
                   passed: false)
     check.fail! unless check.failed?
-    notify_failure!
+    notify_failure! check
   end
 
   def append_log(str)
